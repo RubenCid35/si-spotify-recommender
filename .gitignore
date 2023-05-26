@@ -23,3 +23,6 @@ buildNumber.properties
 
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# Graph File: It is too big 
+*.gpickle
