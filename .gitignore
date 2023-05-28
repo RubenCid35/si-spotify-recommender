@@ -1,4 +1,3 @@
-
 # Target Folder
 target/
 
@@ -26,3 +25,9 @@ buildNumber.properties
 
 # Graph File: It is too big 
 *.gpickle
+
+## # Byte-compiled / optimized / DLL files
+__pycache__/
+.Python
+.ipynb_checkpoints
+__pypackages__/

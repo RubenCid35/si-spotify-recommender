@@ -37,8 +37,9 @@ Esto es una lista de componentes que faltan por completar. Si una actividad ha s
 * [ ] Devolver la información a la interfaz.
 
 ## Agente Recomendador (Python)
-* [ ] Crear servidor para recibir peticiones
+* [x] Crear servidor para recibir peticiones
 * [ ] Deserializar los mensajes y procesarlos
+* [ ] Procesar Peticiones del agente
 * [x] Crear modelo de recomendaciones
 * [ ] Crear DockerFile
 * [ ] Implementar el uso del modelo.
