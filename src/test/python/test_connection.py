@@ -9,7 +9,7 @@ def test_server():
     cliente.connect((host, port))
 
 
-    for _ in range(20):
+    while True:
         # Send data to the server
         data = "{ }"
         cliente.send(data.encode())
@@ -18,8 +18,9 @@ def test_server():
         respuesta = cliente.recv(1024).decode()
 
         # Print the response
-        print("Server response:", respuesta)
-        if "200" in respuesta: break
+        if "200" in respuesta: 
+            print("Server response:", respuesta)
+            break
 
     # Close the connection
     cliente.close()
