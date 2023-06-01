@@ -12,7 +12,7 @@ Este trabajo fue realizado por:
 | Rodrigo Durán Andrés      | rodrigo.duran.andres@alumnos.upm.es |
 | Ignacio Guzmán García     |                                     |
 | Nerea Rodriguez Francisco |                                     |
-| Jorge Saenz de Miera      |                                     |
+| Jorge Saenz de Miera      | jorge.saenzdemiera@alumnos.upm.es   |
 
 ## Lista de TODO
 En el archivo TODO.md tienen acceso a la lista partes faltante. Marquen cuando acaben.
