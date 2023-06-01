@@ -22,6 +22,21 @@ def test_server():
             print("Server response:", respuesta)
             break
 
+    data = "{ }"
+    cliente.send(data.encode())
+    respuesta = cliente.recv(1024).decode()
+    print("Server response:", respuesta)
+
+    data = "{ }"
+    cliente.send(data.encode())
+    respuesta = cliente.recv(1024).decode()
+    print("Server response:", respuesta)
+
+    data = "{ }"
+    cliente.send(data.encode())
+    respuesta = cliente.recv(1024).decode()
+    print("Server response:", respuesta)
+
     # Close the connection
     cliente.close()
 

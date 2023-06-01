@@ -22,7 +22,6 @@ Esto es una lista de componentes que faltan por completar. Si una actividad ha s
 
 * [ ] TODO
 
-
 ## Agente Recomendador (JAVA)
 
 * [ ] Crear y Definir los comportamientos del recomendador de Java
@@ -37,9 +36,9 @@ Esto es una lista de componentes que faltan por completar. Si una actividad ha s
 * [ ] Devolver la información a la interfaz.
 
 ## Agente Recomendador (Python)
-* [x] Crear servidor para recibir peticiones
-* [ ] Deserializar los mensajes y procesarlos
-* [ ] Procesar Peticiones del agente
+* [x] Deserializar los mensajes y procesarlos
+* [x] Procesar Peticiones del agente
 * [x] Crear modelo de recomendaciones
+* [x] Crear servidor para recibir peticiones
 * [ ] Crear DockerFile
-* [ ] Implementar el uso del modelo.
+* [x] Implementar el uso del modelo.

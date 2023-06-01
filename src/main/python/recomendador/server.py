@@ -8,6 +8,8 @@ from socket import AF_INET, SOCK_STREAM
 from recommender import Recommender
 
 from log import logger
+import signal
+
 
 ## Server Configuration
 HOST = "127.0.0.1"
@@ -23,9 +25,9 @@ def wait_model_loading ( connection: socket, recommender: Recommender):
             modelos_cargados = recommender.is_active()
             
             if not modelos_cargados:
-                response = { 'code': 500 }
+                response = { 'status': 500 }
             else: 
-                response = { 'code': 200 }
+                response = { 'status': 200 }
             
             response = json.dumps( response, indent = 2)
             connection.send( bytes ( response , encoding = 'utf-8'))
@@ -35,51 +37,88 @@ def wait_model_loading ( connection: socket, recommender: Recommender):
             return False
     return True
 
+"""
+Search Between All Songs
+{
+    "all": true,
+    "seeds": [" dsadsdadsa", "dssdsasdadsa"],
+    "urls": []
+}
+
+Search Between a Collection of Songs
+
+{
+    "all": false,
+    "seeds": [" dsadsdadsa", "dssdsasdadsa"],
+    "urls": [" dsadsdadsa", "dssdsasdadsa"]
+}
+
+"""
+
+
 def process_petition(connection: socket, address, recommender: Recommender):
     logger.info(f"Connection Established: ({address[0]}) - ({address[1]})")
     
     keep_conected = wait_model_loading(connection, recommender)
 
     i = 0
-    while keep_conected:
-        petition = connection.recv(1024)
-        petition = petition.decode('utf-8')
-        
-        if len(petition) == 0: 
-            keep_conected = False
-            continue
-
-        try: 
-            petition = json.loads(petition)
-            logger.info(json.dumps(petition, indent = 2))
+    try:
+        while keep_conected:
+            petition = connection.recv(5000)
+            petition = petition.decode('utf-8')
             
-            response = recommender.recommend(i, petition)
+            if len(petition) == 0: 
+                keep_conected = False
+                continue
 
-        except json.JSONDecodeError:
-            response = { "code": 401 }
-            logger.error("Fail to Create M")
+            try: 
+                petition = json.loads(petition)
+                # logger.info(json.dumps(petition, indent = 2))
+                
+                response = recommender.recommend(petition)
+                connection.send( bytes ( json.dumps( response, indent = 2), encoding = 'utf-8'))
 
-        connection.send( bytes ( json.dumps( response, indent = 2), encoding = 'utf-8'))
-        i += 1
+            except json.JSONDecodeError:
+                response = { "status": 401 }
+                logger.error("Fail to Create M")
+
+            i += 1
+
+    except KeyboardInterrupt:
+        recomender.shutdown()
+
+    logger.info(f"Connection Finalized  : ({address[0]}) - ({address[1]})")
+
+# def handler(signum, frame):
+#     logger.info("Closing Service")
+#     logger.info("%s", type(recomender))
+#     recomender.shutdown()
+# 
+# signal.signal(signal.SIGINT, handler)
+
 
 def main(): 
+    global recomender
 
-    recomemnder = Recommender()
+    logger.info("Initiating the Server")
+
+    recomender = Recommender()
+
 
     soc  = socket(AF_INET, SOCK_STREAM)
     soc.bind((HOST, PORT))
+    soc.settimeout(60.)
     soc.listen()
 
-    client_found = False
-    while not client_found:
-        connection, address = soc.accept()
-        process_petition(connection, address, recomemnder)
-        connection.close()
+    logger.info("Start")
+    while True:
+        try:
+            connection, address = soc.accept()
+            process_petition(connection, address, recomender)
 
-        client_found = True
-    
-
-
-
+        except soq.timeout:
+            logger.debug("Timeout: Fail to Find New User")
+            recomender.shutdown()
+            break
 
 if __name__ == '__main__': main()
