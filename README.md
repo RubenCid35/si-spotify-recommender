@@ -28,25 +28,25 @@ Pueden hacer click en el siguiente enlace para ver: [todo](./TODO.md)
 4) Abrir el IDE Eclipse y añadir las librerias de la carpeta 'lib' al java build path del proyecto
 5) Ir al archivo Main.java y ejecutarlo como una Java application
 6) Introducir 5 canciones por la interfaz que se presenta. Deben ser canciones que existan en la base de datos. Aquí se presenta una lista con 20 opciones:
-Abeja Miope
-If I Gave Myself To Someone Else
-Mercy
-Still Got Time (feat. PARTYNEXTDOOR)
-It's Alright Now
-Ginger
-I Ain't Safe
-Yee - Original Mix
-Jasmine Runs Away
-Hit It From The Back
-Middle
-Halloween, 1987
-Mamzad (Serjik)
-At Your Feet (Live)
-Be Alright (feat. EMEL)
-The Way I Am
-I Can't Live Without You
-Heart and Soul - From 'Camp Rock 2: The Final Jam'
-Early Morning Riser
+Abeja Miope;
+If I Gave Myself To Someone Else;
+Mercy;
+Still Got Time (feat. PARTYNEXTDOOR);
+It's Alright Now;
+Ginger;
+I Ain't Safe;
+Yee - Original Mix;
+Jasmine Runs Away;
+Hit It From The Back;
+Middle;
+Halloween, 1987;
+Mamzad (Serjik);
+At Your Feet (Live);
+Be Alright (feat. EMEL);
+The Way I Am;
+I Can't Live Without You;
+Heart and Soul - From 'Camp Rock 2: The Final Jam';
+Early Morning Riser;
 Those Who Know
 
 ## Modelo Usado
