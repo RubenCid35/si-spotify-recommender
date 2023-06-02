@@ -10,7 +10,7 @@ Este trabajo fue realizado por:
 |---------------------------|-------------------------------------|
 | Rubén Cid Costa           | ruben.cid@alumnos.upm.es            |
 | Rodrigo Durán Andrés      | rodrigo.duran.andres@alumnos.upm.es |
-| Ignacio Guzmán García     |                                     |
+| Ignacio Guzmán García     | ignacioguzman.garcia.luengo@alumnos.upm.es                                    |
 | Nerea Rodriguez Francisco |                                     |
 | Jorge Saenz de Miera      | jorge.saenzdemiera@alumnos.upm.es   |
 
