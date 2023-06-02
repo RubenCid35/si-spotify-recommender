@@ -24,16 +24,10 @@ Esto es una lista de componentes que faltan por completar. Si una actividad ha s
 
 ## Agente Recomendador (JAVA)
 
-* [ ] Crear y Definir los comportamientos del recomendador de Java
-
-    * [ ] Comportamiento 1 (Circular  ) : Recibir y deserializar el mensaje de catalogo. 
-    * [ ] Comportamiento 2 (Secuencial) : Mandar el mensaje al contenedor de Python
-    * [ ] Comportamiento 3 (Secuencial) : Solicitar la información de las mejores recomendaciones
-    * [ ] Comportamiento 4 (Secuencial) : Mandar la Información a Interfaz
-
-* [ ] Crear conexión con el recomendador de python
-* [ ] Solicitar la información de las N recomendaciones a catalogo. 
-* [ ] Devolver la información a la interfaz.
+* [x] Crear y Definir los comportamientos del recomendador de Java
+* [x] Crear conexión con el recomendador de python
+* [x] Solicitar la información de las N recomendaciones a catalogo. 
+* [x] Devolver la información a la interfaz.
 
 ## Agente Recomendador (Python)
 * [x] Deserializar los mensajes y procesarlos
