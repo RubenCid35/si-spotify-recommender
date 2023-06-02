@@ -1,10 +1,10 @@
 package com.upm.SistemasInteligentes.recommender.spotify;
 
 public enum AgentModel {
-	VISUALIZACION(" Visualizacion"), 
-	AGENTECATALOGO(" AgentCatalogo"), 
-	RECOMENDADOR(" Recomendador"),
-	DESCONOCIDO(" Desconocido");
+	AGENTEVISUALIZACION("Visualizacion"), 
+	AGENTECATALOGO("AgentCatalogo"), 
+	AGENTERECOMENDADOR("Recomendador"),
+	DESCONOCIDO("Desconocido");
 	
 	private final String value;
 
@@ -18,12 +18,12 @@ public enum AgentModel {
 
 	public static AgentModel getEnum(String value) {
 		switch (value) {
-		case " Visualizacion":
-			return VISUALIZACION;
-		case " AgentCatalogo":
+		case "Visualizacion":
+			return AGENTEVISUALIZACION;
+		case "AgentCatalogo":
 			return AGENTECATALOGO;
-		case " Recomendador":
-			return RECOMENDADOR;
+		case "Recomendador":
+			return AGENTERECOMENDADOR;
 		default:
 			return DESCONOCIDO;
 		}

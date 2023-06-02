@@ -1,3 +1,5 @@
+package com.upm.SistemasInteligentes.recommender.spotify;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,33 +12,50 @@ import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-public class AgenteVisualizacion extends Agent {
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
+import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import com.upm.SistemasInteligentes.recommender.spotify.messages.*;
+
+public class AgenteVisualizacion extends AgentBase {
 	public ArrayList<String> uris_canciones = new ArrayList();
     protected void setup() {
+		super.setup();
+		this.type = AgentModel.AGENTEVISUALIZACION;
+    	
         SequentialBehaviour seq = new SequentialBehaviour(this);
         String cancion1 = JOptionPane.showInputDialog(null, "Introduzca cancion 1", "Input Dialog", JOptionPane.PLAIN_MESSAGE);
         seq.addSubBehaviour(new EnviarCancionBehaviour(cancion1));
         seq.addSubBehaviour(new EsperarRespuestaBehaviour());
     	
-        String cancion2 = JOptionPane.showInputDialog(null, "Introduzca cancion 2", "Input Dialog", JOptionPane.PLAIN_MESSAGE);
+        String cancion2 = JOptionPane.showInputDialog(null, "Introduzca el texto a buscar", "Input Dialog", JOptionPane.PLAIN_MESSAGE);
         seq.addSubBehaviour(new EnviarCancionBehaviour(cancion2));
         seq.addSubBehaviour(new EsperarRespuestaBehaviour());
         
-        String cancion3 = JOptionPane.showInputDialog(null, "Introduzca cancion 3", "Input Dialog", JOptionPane.PLAIN_MESSAGE);
+        String cancion3 = JOptionPane.showInputDialog(null, "Introduzca el texto a buscar", "Input Dialog", JOptionPane.PLAIN_MESSAGE);
         seq.addSubBehaviour(new EnviarCancionBehaviour(cancion3));
         seq.addSubBehaviour(new EsperarRespuestaBehaviour());
         
-        String cancion4 = JOptionPane.showInputDialog(null, "Introduzca cancion 4", "Input Dialog", JOptionPane.PLAIN_MESSAGE);
+        String cancion4 = JOptionPane.showInputDialog(null, "Introduzca el texto a buscar", "Input Dialog", JOptionPane.PLAIN_MESSAGE);
         seq.addSubBehaviour(new EnviarCancionBehaviour(cancion4));
         seq.addSubBehaviour(new EsperarRespuestaBehaviour());
         
-        String cancion5 = JOptionPane.showInputDialog(null, "Introduzca cancion 5", "Input Dialog", JOptionPane.PLAIN_MESSAGE);
+        String cancion5 = JOptionPane.showInputDialog(null, "Introduzca el texto a buscar", "Input Dialog", JOptionPane.PLAIN_MESSAGE);
         seq.addSubBehaviour(new EnviarCancionBehaviour(cancion5));
         seq.addSubBehaviour(new EsperarRespuestaBehaviour());
         
-        seq.addSubBehaviour(new EnviarUrisBehaviour());
         
         addBehaviour(seq);
+        registerAgentDF();
     }
 
     private class EnviarCancionBehaviour extends OneShotBehaviour {
@@ -59,6 +78,7 @@ public class AgenteVisualizacion extends Agent {
             MessageTemplate mt = MessageTemplate.MatchSender(getAID("AgenteCatalogo"));
             ACLMessage msg = this.myAgent.blockingReceive(mt);
             if (msg.getContent() != "null") {
+                System.out.println("1");
 
             	uris_canciones.add(msg.getContent());
             	System.out.println(uris_canciones);
@@ -71,20 +91,43 @@ public class AgenteVisualizacion extends Agent {
         } 
     }
     
-    private class EnviarUrisBehaviour extends OneShotBehaviour {
+    private class EnviarListaRecomendador extends CyclicBehaviour {
+    	
         public void action() {
-        	//ACLMessage uris = new ACLMessage(ACLMessage.INFORM);
-        	SolicitudRecomendador uris = new SolicitudRecomendador();
-        	uris.setSeeds(uris_canciones);
-        	ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-        	try {
-				msg.setContentObject((Serializable) uris);
+        	
+        	SolicitudRecomendador contenido = new SolicitudRecomendador();
+        	contenido.setSeeds(uris_canciones);
+            // Crear el mensaje
+            ACLMessage mensaje = new ACLMessage(ACLMessage.REQUEST);
+            mensaje.addReceiver(getAID("AgenteRecomendador"));
+
+            // Establecer la lista de canciones como contenido del mensaje
+            try {
+				mensaje.setContentObject(contenido);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-            send(msg);
+
+            // Enviar el mensaje
+            send(mensaje);
+            System.out.println("AgenteVisualizacion envió la lista de canciones al AgenteRecomendador");
+
+            // Esperar la respuesta del AgenteRecomendador
+            MessageTemplate plantilla = MessageTemplate.MatchSender(getAID("AgenteRecomendador"));
+            ACLMessage respuesta = receive(plantilla);
+
+            if (respuesta != null) {
+                System.out.println("AgenteVisualizacion recibió respuesta del AgenteRecomendador: " + respuesta.getContent());
+                // Finalizar el comportamiento
+                myAgent.removeBehaviour(this);
+            } else {
+                // Si no se recibe respuesta, se bloquea el comportamiento hasta recibir un nuevo mensaje
+                block();
+            }
         }
     }
+    
+    
     
 }

@@ -55,7 +55,7 @@ public class AgenteRecomendador extends AgentBase {
 	protected void setup() {
 		
 		super.setup();
-		this.type = AgentModel.RECOMENDADOR;
+		this.type = AgentModel.AGENTERECOMENDADOR;
 
 	    MessageTemplate template_peticion = MessageTemplate.MatchPerformative( ACLMessage.REQUEST );
 	    MessageTemplate template_cancion  = MessageTemplate.MatchPerformative( ACLMessage.INFORM );

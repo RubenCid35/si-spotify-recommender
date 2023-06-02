@@ -1,8 +1,5 @@
 package com.upm.SistemasInteligentes.recommender.spotify;
 
-import com.upm.SistemasInteligentes.recommender.spotify.messages.SolicitudNombreCanciones;
-import com.upm.SistemasInteligentes.recommender.spotify.messages.RespuestaNombreCanciones;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -14,15 +11,25 @@ import java.util.List;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import jade.core.behaviours.ParallelBehaviour;
+import com.upm.SistemasInteligentes.recommender.spotify.messages.*;
 
-public class AgenteCatalogo extends Agent {
+public class AgenteCatalogo extends AgentBase {
 	
 	protected void setup() {
-		addBehaviour(new EsperarMensajeBehaviour());
-		addBehaviour(new EsperarIdsBehaviour());
+		super.setup();
+		this.type = AgentModel.AGENTECATALOGO;
+		
+		ParallelBehaviour par = new ParallelBehaviour();
+		par.addSubBehaviour(new EsperarMensajeBehaviour());
+		par.addSubBehaviour(new EsperarIdsBehaviour());
+		addBehaviour(par);
+		registerAgentDF();
+
 	}
 
 	private class EsperarMensajeBehaviour extends CyclicBehaviour {
@@ -32,6 +39,7 @@ public class AgenteCatalogo extends Agent {
 			ACLMessage msg = this.myAgent.blockingReceive(mt);
 			if (msg != null) {
 				String cancion = msg.getContent();
+
 				String resultado = id(cancion);
 
 				ACLMessage respuesta = new ACLMessage(ACLMessage.INFORM);
