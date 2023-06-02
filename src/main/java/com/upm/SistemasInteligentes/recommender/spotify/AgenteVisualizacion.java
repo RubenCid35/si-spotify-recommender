@@ -1,3 +1,6 @@
+package com.upm.SistemasInteligentes.recommender.spotify;
+import com.upm.SistemasInteligentes.recommender.spotify.messages.SolicitudRecomendador;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
