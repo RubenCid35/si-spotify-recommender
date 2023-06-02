@@ -33,7 +33,7 @@ GRAPH_PATH    : str = "./data/graph.gpickle"
 FEATURES_DATA : str = "./data/songset_features.csv"
 
 GAMMA: float = 0.95
-NUMBER:  int = 50
+NUMBER:  int = 5
 
 import signal
 
@@ -78,13 +78,6 @@ class Recommender():
         self.graph, self.weight = load_graph(GRAPH_PATH, self.uri_map)
         end   = time.perf_counter()
         logger.info("Data :  Loaded  Graph (Time: %6.2f)", end - start)
-
-        logger.info("Data :  Building K-Neighbours-Model")
-        start = time.perf_counter()
-        self.kneigh = NearestNeighbors(n_neighbors=25, radius=0.4)
-        self.kneigh = self.kneigh.fit(self.features)
-        end   = time.perf_counter()
-        logger.info("Data :  Built    K-Neighbours-Model (Time: %6.2f)", end - start)
 
     def recommend_process(self, input_queue: Queue, output_queue: Queue):
         signal.signal(signal.SIGINT, signal.SIG_IGN)

@@ -31,3 +31,4 @@ __pycache__/
 .Python
 .ipynb_checkpoints
 __pypackages__/
+/bin/

@@ -49,8 +49,7 @@ Search Between a Collection of Songs
 
 {
     "all": false,
-    "seeds": [" dsadsdadsa", "dssdsasdadsa"],
-    "urls": [" dsadsdadsa", "dssdsasdadsa"]
+    "seeds": [" dsadsdadsa", "dssdsasdadsa"]
 }
 
 """
