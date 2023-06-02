@@ -14,9 +14,6 @@ import torch
 import torch.nn.functional as F
 
 import networkx as nx
-from sklearn.neighbors import NearestNeighbors
-from torch.nn.functional import normalize
-
 from multiprocessing import Queue, Process, Value
 
 from log import logger

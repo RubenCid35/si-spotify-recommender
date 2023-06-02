@@ -1,18 +1,12 @@
 package com.upm.SistemasInteligentes.recommender.spotify;
 
-import jade.core.Agent;
-import com.upm.SistemasInteligentes.recommender.spotify.AgentBase;
-import com.upm.SistemasInteligentes.recommender.spotify.AgentModel;
 import com.upm.SistemasInteligentes.recommender.spotify.behaviours.Receiver;
 import com.upm.SistemasInteligentes.recommender.spotify.messages.SolicitudRecomendador;
 import com.upm.SistemasInteligentes.recommender.spotify.messages.SolicitudNombreCanciones;
-
-import com.upm.SistemasInteligentes.recommender.spotify.behaviours.Receiver;
+import com.upm.SistemasInteligentes.recommender.spotify.messages.RespuestaNombreCanciones;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.SequentialBehaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.SimpleBehaviour;
 
@@ -20,7 +14,6 @@ import java.io.IOException;
 import java.net.*;
 import java.io.*;
 
-import jade.core.AID;
 import jade.lang.acl.*;
 
 import java.util.ArrayList;
@@ -164,6 +157,10 @@ public class AgenteRecomendador extends AgentBase {
 			this.agent = agent;
 		}
 		public void action () {
+			if (this.agent.songs.isEmpty()) {
+				done = true;
+				return ;
+			}
 			
 			SolicitudNombreCanciones content = new SolicitudNombreCanciones();
 			content.setSongs(agent.songs);
@@ -183,10 +180,9 @@ public class AgenteRecomendador extends AgentBase {
     	    ACLMessage msg = this.myAgent.blockingReceive(template_cancion);
             if (msg != null ) {
             	try {
-            		ArrayList<String> respuesta = new ArrayList<String>();
-            		respuesta = (ArrayList<String>) msg.getContentObject();
-            		
-            		this.agent.songs_names = respuesta;
+            		RespuestaNombreCanciones respuesta = new RespuestaNombreCanciones();
+            		respuesta = (RespuestaNombreCanciones) msg.getContentObject();
+            		this.agent.songs_names = respuesta.getSongs();
             			
     			}catch (UnreadableException e) {
     				e.printStackTrace(); 
