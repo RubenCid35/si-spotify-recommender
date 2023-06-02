@@ -1,3 +1,8 @@
+package com.upm.SistemasInteligentes.recommender.spotify;
+
+import com.upm.SistemasInteligentes.recommender.spotify.messages.SolicitudNombreCanciones;
+import com.upm.SistemasInteligentes.recommender.spotify.messages.RespuestaNombreCanciones;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
