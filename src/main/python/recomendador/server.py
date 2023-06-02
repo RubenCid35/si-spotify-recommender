@@ -106,7 +106,6 @@ def main():
 
     soc  = socket(AF_INET, SOCK_STREAM)
     soc.bind((HOST, PORT))
-    soc.settimeout(60.)
     soc.listen()
 
     logger.info("Start")
@@ -114,6 +113,10 @@ def main():
         try:
             connection, address = soc.accept()
             process_petition(connection, address, recomender)
+
+        except KeyboardInterrupt:
+            recomender.shutdown()
+            break
 
         except soq.timeout:
             logger.debug("Timeout: Fail to Find New User")

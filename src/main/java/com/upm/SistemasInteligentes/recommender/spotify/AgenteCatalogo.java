@@ -16,6 +16,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.core.behaviours.ParallelBehaviour;
+
 import com.upm.SistemasInteligentes.recommender.spotify.messages.*;
 
 public class AgenteCatalogo extends AgentBase {
@@ -24,10 +25,14 @@ public class AgenteCatalogo extends AgentBase {
 		super.setup();
 		this.type = AgentModel.AGENTECATALOGO;
 		
-		ParallelBehaviour par = new ParallelBehaviour();
-		par.addSubBehaviour(new EsperarMensajeBehaviour());
-		par.addSubBehaviour(new EsperarIdsBehaviour());
-		addBehaviour(par);
+		// ParallelBehaviour par = new ParallelBehaviour();
+		// par.addSubBehaviour(new EsperarMensajeBehaviour());
+		// par.addSubBehaviour(new EsperarIdsBehaviour());
+		// addBehaviour(par);
+		
+		EsperarMensajeBehaviour espera = new EsperarMensajeBehaviour();
+		addBehaviour(espera);
+		
 		registerAgentDF();
 
 	}
@@ -36,26 +41,32 @@ public class AgenteCatalogo extends AgentBase {
 
 		public void action() {
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-			ACLMessage msg = this.myAgent.blockingReceive(mt);
+			ACLMessage msg = this.myAgent.receive(mt);
+			
+			
 			if (msg != null) {
+				System.out.println("Catalogo URI Search");
 				String cancion = msg.getContent();
 
+	        	System.out.println(EsperarMensajeBehaviour.class.getName());
 				String resultado = id(cancion);
+	        	System.out.println(EsperarMensajeBehaviour.class.getName());
 
 				ACLMessage respuesta = new ACLMessage(ACLMessage.INFORM);
 				respuesta.setContent(resultado);
 				respuesta.addReceiver(msg.getSender());
 				send(respuesta);
 			} else {
-				block();
 			}
 		}
 	}
 
 		private class EsperarIdsBehaviour extends CyclicBehaviour {
 			public void action() {
+
+				System.out.println("Catalogo Name Search");
 				MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF);
-				ACLMessage msg = this.myAgent.blockingReceive(mt);
+				ACLMessage msg = this.myAgent.receive(mt);
 				if (msg != null) {
 					SolicitudNombreCanciones ids = new SolicitudNombreCanciones();
 					try {

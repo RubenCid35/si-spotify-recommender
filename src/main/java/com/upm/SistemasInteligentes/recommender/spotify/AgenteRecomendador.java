@@ -58,7 +58,6 @@ public class AgenteRecomendador extends AgentBase {
 		this.type = AgentModel.AGENTERECOMENDADOR;
 
 	    MessageTemplate template_peticion = MessageTemplate.MatchPerformative( ACLMessage.REQUEST );
-	    MessageTemplate template_cancion  = MessageTemplate.MatchPerformative( ACLMessage.INFORM );
 	          
 	    
         cyclic_behaviourr = new FSMBehaviour();
@@ -73,6 +72,8 @@ public class AgenteRecomendador extends AgentBase {
 						solicitud = (SolicitudRecomendador) msg.getContentObject();
 					}catch ( UnreadableException e) {}
 					seeds = solicitud.getSeeds();
+					System.out.println(seeds);
+				
 				}
             }
          }, "Step1");
@@ -115,7 +116,8 @@ public class AgenteRecomendador extends AgentBase {
 				// Crear un objeto para enviar datos al servidor
 	            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
-	            // Enviar un paquete al servidor
+				System.out.println(this.agent.seeds);
+				// Enviar un paquete al servidor
 	            RequestRecSocket message = new RequestRecSocket(this.agent.seeds);
 	            String json_msg = mapper.writeValueAsString(message);
 	            writer.println(json_msg);
@@ -130,6 +132,9 @@ public class AgenteRecomendador extends AgentBase {
 	            }else {
 	              	songs = new ArrayList<String>();
 	            }
+	            
+
+				System.out.println(this.agent.songs);
 	            done = true;
 	            
             

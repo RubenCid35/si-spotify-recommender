@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.SimpleBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -28,6 +29,8 @@ import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import com.upm.SistemasInteligentes.recommender.spotify.messages.*;
+
+import com.upm.SistemasInteligentes.recommender.spotify.Utils;
 
 public class AgenteVisualizacion extends AgentBase {
 	public ArrayList<String> uris_canciones = new ArrayList();
@@ -56,6 +59,7 @@ public class AgenteVisualizacion extends AgentBase {
         seq.addSubBehaviour(new EnviarCancionBehaviour(cancion5));
         seq.addSubBehaviour(new EsperarRespuestaBehaviour());
         
+        // seq.addSubBehaviour(new EnviarListaRecomendador());
         
         addBehaviour(seq);
         registerAgentDF();
@@ -68,20 +72,24 @@ public class AgenteVisualizacion extends AgentBase {
     		this.cancion = cancion;
     	}
         public void action() {
-            ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-            msg.setContent(this.cancion); 
-            msg.addReceiver(getAID("AgenteCatalogo"));
-
-            send(msg);
+        	System.out.println(EnviarCancionBehaviour.class.getName());
+            System.out.println(this.cancion);
+        	Utils.enviarMensaje(this.myAgent, "AgentCatalogo", this.cancion, ACLMessage.REQUEST);
+            System.out.println("Enviado");
+        	
+        	// ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+        	// msg.setContent(this.cancion); 
+        	// msg.addReceiver(getAID("AgenteCatalogo"))
+        	// send(msg);
         }
     }
 
     private class EsperarRespuestaBehaviour extends OneShotBehaviour {
         public void action() {
-            MessageTemplate mt = MessageTemplate.MatchSender(getAID("AgenteCatalogo"));
+        	System.out.println(EsperarRespuestaBehaviour.class.getName());
+        	MessageTemplate mt = MessageTemplate.MatchSender(getAID("AgenteCatalogo"));
             ACLMessage msg = this.myAgent.blockingReceive(mt);
-            if (msg.getContent() != "null") {
-                System.out.println("1");
+            if (msg != null) {
 
             	uris_canciones.add(msg.getContent());
             	System.out.println(uris_canciones);
@@ -94,10 +102,13 @@ public class AgenteVisualizacion extends AgentBase {
         } 
     }
     
-    private class EnviarListaRecomendador extends CyclicBehaviour {
+    private class EnviarListaRecomendador extends OneShotBehaviour {
     	
         public void action() {
-        	
+
+        	System.out.println(EnviarListaRecomendador.class.getName());
+
+            System.out.println("Enviando A recomendador");            
         	SolicitudRecomendador contenido = new SolicitudRecomendador();
         	contenido.setSeeds(uris_canciones);
             // Crear el mensaje
