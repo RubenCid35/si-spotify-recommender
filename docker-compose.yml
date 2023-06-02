@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  spotify_mysql:
+    image: jorgesaenzdemiera/spotify_mysql:v1
+    ports:
+      - 3326:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password

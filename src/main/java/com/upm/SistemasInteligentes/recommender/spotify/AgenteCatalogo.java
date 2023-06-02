@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,10 +11,13 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
 public class AgenteCatalogo extends Agent {
+	
 	protected void setup() {
 		addBehaviour(new EsperarMensajeBehaviour());
+		addBehaviour(new EsperarIdsBehaviour());
 	}
 
 	private class EsperarMensajeBehaviour extends CyclicBehaviour {
@@ -32,25 +37,38 @@ public class AgenteCatalogo extends Agent {
 				block();
 			}
 		}
+	}
 
-		/*private class EsperarIdsBehaviour extends CyclicBehaviour {
+		private class EsperarIdsBehaviour extends CyclicBehaviour {
 			public void action() {
 				MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF);
 				ACLMessage msg = this.myAgent.blockingReceive(mt);
 				if (msg != null) {
 					SolicitudNombreCanciones ids = new SolicitudNombreCanciones();
-					ids = (SolicitudNombreCanciones) msg.getContentObject();
-					List<String> nombres = nombreCanciones(ids.getSongs());
+					try {
+						ids = (SolicitudNombreCanciones) msg.getContentObject();
+					} catch (UnreadableException e) {
+						e.printStackTrace();
+					}
+					
+					ArrayList<String> nombres = nombreCanciones(ids.getSongs());
+					
+					RespuestaNombreCanciones nombre_canciones = new RespuestaNombreCanciones();
+					nombre_canciones.setSongs(nombres);
 
 					ACLMessage respuesta = new ACLMessage(ACLMessage.INFORM);
-					respuesta.setContentObject(nombres);
+					try {
+						respuesta.setContentObject((Serializable) nombre_canciones);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 					respuesta.addReceiver(msg.getSender());
 					send(respuesta);
 				} else {
 					block();
 				}
 			}
-		}*/
+		}
 
 		private String id(String nombre) {
 			String id_cancion = null;
@@ -88,21 +106,21 @@ public class AgenteCatalogo extends Agent {
 			return id_cancion;
 		};
 
-		/*private ArrayList<String> nombreCanciones(ArrayList<String> nombres) {
+		private ArrayList<String> nombreCanciones(ArrayList<String> uris) {
 			Conexion conexion = new Conexion();
 			Connection cn = null;
 			PreparedStatement ps = null;
 			ResultSet rs = null;
-			ArrayList<String> id_canciones = new ArrayList<>();
+			ArrayList<String> nombres_canciones = new ArrayList<>();
 
 			try {
 				cn = conexion.conectar();
-				String sql = "SELECT id_cancion FROM canciones WHERE name IN (";
+				String sql = "SELECT name FROM canciones WHERE id_cancion IN (";
 				StringBuilder placeholders = new StringBuilder();
 
-				for (int i = 0; i < nombres.size(); i++) {
+				for (int i = 0; i < uris.size(); i++) {
 					placeholders.append("?");
-					if (i < nombres.size() - 1) {
+					if (i < uris.size() - 1) {
 						placeholders.append(",");
 					}
 				}
@@ -110,20 +128,20 @@ public class AgenteCatalogo extends Agent {
 				sql += placeholders.toString() + ")";
 				ps = cn.prepareStatement(sql);
 
-				for (int i = 0; i < nombres.size(); i++) {
-					ps.setString(i + 1, nombres.get(i));
+				for (int i = 0; i < uris.size(); i++) {
+					ps.setString(i + 1, uris.get(i));
 				}
 
 				rs = ps.executeQuery();
 
 				while (rs.next()) {
-					id_canciones.add(rs.getString(1));
+					nombres_canciones.add(rs.getString(1));
 				}
 			} catch (SQLException e) {
 				System.out.println("Error en la consulta");
 				e.printStackTrace();
 			}
-			return id_canciones;
-		};*/
-	}
+			return nombres_canciones;
+		};
 }
+
