@@ -18,6 +18,8 @@ Este trabajo fue realizado por:
 En el archivo TODO.md tienen acceso a la lista partes faltante. Marquen cuando acaben.
 Pueden hacer click en el siguiente enlace para ver: [todo](./TODO.md)
 
+
+
 ## Uso 
 
 Para poder usar el sistema de recomendación, se debe usar descargar la información del 
