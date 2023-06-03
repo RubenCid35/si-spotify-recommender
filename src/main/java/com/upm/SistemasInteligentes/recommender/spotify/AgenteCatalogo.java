@@ -20,17 +20,13 @@ import jade.core.behaviours.ParallelBehaviour;
 import com.upm.SistemasInteligentes.recommender.spotify.messages.*;
 
 public class AgenteCatalogo extends AgentBase {
-	
+	Conexion conexion = new Conexion();
+
 	protected void setup() {
 		super.setup();
 		this.type = AgentModel.AGENTECATALOGO;
 		
-		// ParallelBehaviour par = new ParallelBehaviour();
-		// par.addSubBehaviour(new EsperarMensajeBehaviour());
-		// par.addSubBehaviour(new EsperarIdsBehaviour());
-		// addBehaviour(par);
-		
-		EsperarMensajeBehaviour espera = new EsperarMensajeBehaviour();
+		EsperarMensajeBehaviour espera = new EsperarMensajeBehaviour(this);
 		addBehaviour(espera);
 		
 		registerAgentDF();
@@ -39,24 +35,31 @@ public class AgenteCatalogo extends AgentBase {
 
 	private class EsperarMensajeBehaviour extends CyclicBehaviour {
 
+		AgenteCatalogo agent;
+		int number_petitions = 0;
+		EsperarMensajeBehaviour (AgenteCatalogo ag ) {
+			this.agent = ag;
+		}
+		
 		public void action() {
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 			ACLMessage msg = this.myAgent.receive(mt);
 			
-			
 			if (msg != null) {
 				System.out.println("Catalogo URI Search");
 				String cancion = msg.getContent();
-
-	        	System.out.println(EsperarMensajeBehaviour.class.getName());
-				String resultado = id(cancion);
-	        	System.out.println(EsperarMensajeBehaviour.class.getName());
+				String resultado = id(cancion, this.agent.conexion );
 
 				ACLMessage respuesta = new ACLMessage(ACLMessage.INFORM);
 				respuesta.setContent(resultado);
 				respuesta.addReceiver(msg.getSender());
 				send(respuesta);
-			} else {
+				
+				number_petitions += 1;
+			} 
+			if (number_petitions >= 5) {
+				this.myAgent.addBehaviour(new EsperarIdsBehaviour());
+				this.myAgent.removeBehaviour(this);
 			}
 		}
 	}
@@ -64,10 +67,11 @@ public class AgenteCatalogo extends AgentBase {
 		private class EsperarIdsBehaviour extends CyclicBehaviour {
 			public void action() {
 
-				System.out.println("Catalogo Name Search");
 				MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF);
-				ACLMessage msg = this.myAgent.receive(mt);
+				ACLMessage msg = this.myAgent.blockingReceive(mt);
+				
 				if (msg != null) {
+
 					SolicitudNombreCanciones ids = new SolicitudNombreCanciones();
 					try {
 						ids = (SolicitudNombreCanciones) msg.getContentObject();
@@ -76,6 +80,7 @@ public class AgenteCatalogo extends AgentBase {
 					}
 					
 					ArrayList<String> nombres = nombreCanciones(ids.getSongs());
+					System.out.println(nombres);
 					
 					RespuestaNombreCanciones nombre_canciones = new RespuestaNombreCanciones();
 					nombre_canciones.setSongs(nombres);
@@ -88,28 +93,27 @@ public class AgenteCatalogo extends AgentBase {
 					}
 					respuesta.addReceiver(msg.getSender());
 					send(respuesta);
-				} else {
-					block();
 				}
 			}
 		}
 
-		private String id(String nombre) {
+		private String id(String nombre, Conexion conexion) {
 			String id_cancion = null;
-			Conexion conexion = new Conexion();
-			Connection cn = null;
+
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
+			Connection cn = null;
 			String SQL = "SELECT id_cancion FROM canciones WHERE name LIKE ?";
 			try {
+				
 				cn = conexion.conectar();
 				pstmt = cn.prepareStatement(SQL);
-				pstmt.setString(1, nombre);
+				pstmt.setString(1, "%" + nombre + "%");
 				rs = pstmt.executeQuery();
 
-				while (rs.next()) {
-					id_cancion = rs.getString(1);
-				}
+				rs.next();
+				id_cancion = rs.getString(1);
+				
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {

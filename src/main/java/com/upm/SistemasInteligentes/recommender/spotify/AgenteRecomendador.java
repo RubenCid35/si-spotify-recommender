@@ -1,22 +1,22 @@
 package com.upm.SistemasInteligentes.recommender.spotify;
 
-import com.upm.SistemasInteligentes.recommender.spotify.behaviours.Receiver;
 import com.upm.SistemasInteligentes.recommender.spotify.messages.SolicitudRecomendador;
 import com.upm.SistemasInteligentes.recommender.spotify.messages.SolicitudNombreCanciones;
 import com.upm.SistemasInteligentes.recommender.spotify.messages.RespuestaNombreCanciones;
+import com.upm.SistemasInteligentes.recommender.spotify.messages.InformeRecomendador;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jade.core.behaviours.FSMBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.core.behaviours.SimpleBehaviour;
 
-import java.io.IOException;
 import java.net.*;
 import java.io.*;
 
 import jade.lang.acl.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AgenteRecomendador extends AgentBase {
 	
@@ -25,7 +25,7 @@ public class AgenteRecomendador extends AgentBase {
 
 	// Conexión al servicio de conexión
 	Socket socket;
-	FSMBehaviour cyclic_behaviourr;
+	SequentialBehaviour cyclic_behaviourr;
 
 	private static final long serialVersionUID = 1L;
 	public static final String NICKNAME = "Recomendador";
@@ -57,44 +57,75 @@ public class AgenteRecomendador extends AgentBase {
 		super.setup();
 		this.type = AgentModel.AGENTERECOMENDADOR;
 
-	    MessageTemplate template_peticion = MessageTemplate.MatchPerformative( ACLMessage.REQUEST );
-	          
-	    
-        cyclic_behaviourr = new FSMBehaviour();
-        cyclic_behaviourr.registerState(new Receiver(this, 1000, template_peticion) {
-			private static final long serialVersionUID = 1L;
-
-			public void handle( ACLMessage msg) 
-            {  
-				if (msg != null) {
-					SolicitudRecomendador solicitud = new SolicitudRecomendador();
-					try {
-						solicitud = (SolicitudRecomendador) msg.getContentObject();
-					}catch ( UnreadableException e) {}
-					seeds = solicitud.getSeeds();
-					System.out.println(seeds);
-				
-				}
-            }
-         }, "Step1");
-        
-        cyclic_behaviourr.registerState(new RecomendadorProxy(this), "Step2");
-        cyclic_behaviourr.registerState(new RecogerCanciones(this) , "Step3");
-        cyclic_behaviourr.registerState(new InformarCanciones(this), "Step4");
-
-        cyclic_behaviourr.registerDefaultTransition("Step1", "Step2");
-        cyclic_behaviourr.registerDefaultTransition("Step2", "Step3");
-        cyclic_behaviourr.registerDefaultTransition("Step3", "Step4");
-        cyclic_behaviourr.registerDefaultTransition("StepN", "Step1");
+        cyclic_behaviourr = new SequentialBehaviour();
+        cyclic_behaviourr.addSubBehaviour(new ReceptorSolicitud(this));
+        cyclic_behaviourr.addSubBehaviour(new RecomendadorProxy(this));
+        cyclic_behaviourr.addSubBehaviour(new RecogerCanciones(this) );
+        cyclic_behaviourr.addSubBehaviour(new InformarCanciones(this));
     
         // Initial State
-        cyclic_behaviourr.setExecutionState("Step1");
+        //cyclic_behaviourr.setExecutionState("Step1");
         addBehaviour(cyclic_behaviourr);
         registerAgentDF();
         
+        
+	}
+	
+	protected void takeDonw() {
+		try {
+			this.socket.close();
+			
+		} catch ( IOException e ) {
+			e.printStackTrace();
+		}		
+	}
+	
+	class ReceptorSolicitud extends SimpleBehaviour {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		boolean done = false;
+		int i = 0;
+		private AgenteRecomendador agent;
+		public ReceptorSolicitud (AgenteRecomendador agent ) {
+			super(agent);
+			this.agent = agent;
+		}
+		public void action() {
+
+			i+= 1;
+			System.out.println("Inicio Recomendaciones");
+			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+			ACLMessage msg = this.myAgent.blockingReceive(mt);
+			
+			if (msg != null) {
+				SolicitudRecomendador solicitud = new SolicitudRecomendador();
+				try {
+					solicitud = (SolicitudRecomendador) msg.getContentObject();
+				}catch ( UnreadableException e) {}
+				seeds = solicitud.getSeeds();
+				
+				System.out.println("----------------------------------------------------------------------");				
+				System.out.println(seeds);				
+			}
+			done = true;
+		}
+		public int onEnd() {
+			return 1;
+		}
+		public boolean done() {
+			// TODO Auto-generated method stub
+			return done;
+		}
+
 	}
 	
 	class RecomendadorProxy extends SimpleBehaviour {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		boolean done = false;
 		private AgenteRecomendador agent;
 		public RecomendadorProxy (AgenteRecomendador agent ) {
@@ -116,7 +147,6 @@ public class AgenteRecomendador extends AgentBase {
 				// Crear un objeto para enviar datos al servidor
 	            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
-				System.out.println(this.agent.seeds);
 				// Enviar un paquete al servidor
 	            RequestRecSocket message = new RequestRecSocket(this.agent.seeds);
 	            String json_msg = mapper.writeValueAsString(message);
@@ -132,9 +162,7 @@ public class AgenteRecomendador extends AgentBase {
 	            }else {
 	              	songs = new ArrayList<String>();
 	            }
-	            
 
-				System.out.println(this.agent.songs);
 	            done = true;
 	            
             
@@ -150,10 +178,16 @@ public class AgenteRecomendador extends AgentBase {
 		public boolean done() {
 			return done;
 		}
-
+		public int onEnd() {
+			return 1;
+		}
 	}
 
 	class RecogerCanciones extends SimpleBehaviour {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		boolean done = false;
 		private AgenteRecomendador agent;
 		
@@ -167,28 +201,22 @@ public class AgenteRecomendador extends AgentBase {
 				return ;
 			}
 			
+			
+			System.out.println("Recogiendo Los nombres de recomendaciones");
 			SolicitudNombreCanciones content = new SolicitudNombreCanciones();
 			content.setSongs(agent.songs);
-			ACLMessage mensaje = new ACLMessage(ACLMessage.QUERY_IF);
+            Utils.enviarMensaje(this.myAgent, "AgentCatalogo", content, ACLMessage.QUERY_IF);
             
-			mensaje.addReceiver(getAID("AgentCatalogo"));
-			try {
-	            mensaje.setContentObject(content);
-			}catch (IOException e) {
-				e.printStackTrace(); 
-				done = true;
-				return ;
-			}
-            send(mensaje);
-		
     	    MessageTemplate template_cancion  = MessageTemplate.MatchPerformative( ACLMessage.INFORM );
     	    ACLMessage msg = this.myAgent.blockingReceive(template_cancion);
             if (msg != null ) {
+
+    			System.out.println("Obtenidos Los nombres");
             	try {
             		RespuestaNombreCanciones respuesta = new RespuestaNombreCanciones();
             		respuesta = (RespuestaNombreCanciones) msg.getContentObject();
             		this.agent.songs_names = respuesta.getSongs();
-            			
+        			
     			}catch (UnreadableException e) {
     				e.printStackTrace(); 
     				done = true;
@@ -200,10 +228,17 @@ public class AgenteRecomendador extends AgentBase {
 		public boolean done() {
 			return done;
 		}
+		public int onEnd() {
+			return 1;
+		}
 }
 	
 	
 	class InformarCanciones extends SimpleBehaviour {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		boolean done = false;
 		private AgenteRecomendador agent;
 		
@@ -212,41 +247,44 @@ public class AgenteRecomendador extends AgentBase {
 			this.agent = agent;
 		}
 		public void action () {
-			ACLMessage mensaje = new ACLMessage(ACLMessage.INFORM);
-			mensaje.addReceiver(getAID("AgentCatalogo"));
-			try {
-	            mensaje.setContentObject(this.agent.songs_names);
-			}catch (IOException e) {
-				e.printStackTrace(); 
-				done = true;
-				return ;
-			}
-            send(mensaje);
-            
+			
+			
+			InformeRecomendador contenido = new InformeRecomendador();
+			contenido.setSongs(this.agent.songs_names);
+			Utils.enviarMensaje(this.myAgent, "Visualizacion", contenido, ACLMessage.INFORM);
 
         	this.agent.seeds = new ArrayList<String>();
         	this.agent.songs = new ArrayList<String>();
         	this.agent.songs_names = new ArrayList<String>();
         	
         	done = true;
-        	}
+        }
 		public boolean done() {
 			return done;
 		}
 	}
 	
-	class RequestRecSocket {
-		boolean all;
-		ArrayList<String> seeds;
+	public static class RequestRecSocket implements Serializable{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		public boolean all = true;
+		public ArrayList<String> seeds;
 
 		RequestRecSocket ( ArrayList<String> seed ) {
-			all = false;
+			all = true;
 			seeds = seed;
 		}
+		
 	}
-	class ResponseRecSocket {
-		int status;
-		ArrayList<String> uris;
+	public static class ResponseRecSocket  implements Serializable{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1667804459801773890L;
+		public int status;
+		public List<String> uris;
 	}
 
 	

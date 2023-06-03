@@ -10,24 +10,17 @@ public class Conexion {
 	private static final String URL = "jdbc:mysql://localhost:3326/songs";
 	private static final String CONTRASENA = "password";
 	private static final String USUARIO = "user";
-	
-	static {
-		try {
-			Class.forName(CONTROLADOR);
-			
-		} catch (ClassNotFoundException e) {
-			System.out.println("Error al cargar el controlador");
-			e.printStackTrace();
-	}
-	}
+
 	
 	public Connection conectar() {
 		Connection conexion = null;
 		
 		try {
+			Class.forName(CONTROLADOR);
 			conexion = DriverManager.getConnection(URL,USUARIO,CONTRASENA);
 
-		}catch (SQLException e) {
+		}catch (ClassNotFoundException  | SQLException e) {
+
 			System.out.println("Error en la conexion");
 			e.printStackTrace();
 

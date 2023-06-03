@@ -52,12 +52,10 @@ public class Utils
 	* @param agent Agente desde el que se va a enviar el servicio
 	* @param tipo Tipo del servicio buscado
 	* @param objeto Mensaje a Enviar */
-	public static void enviarMensaje(Agent agent, String tipo, Object objeto, int perfomativa)
+	public static void enviarMensaje(Agent agent, String tipo, String objeto, int perfomativa)
 	{
 		DFAgentDescription[] dfd;
 		dfd=buscarAgentes(agent, tipo);
-		try
-		{
 			if(dfd!=null)
 			{
 				ACLMessage aclMessage = new ACLMessage(perfomativa);
@@ -68,15 +66,33 @@ public class Utils
 				aclMessage.setLanguage(new SLCodec().getName());
 				aclMessage.setEnvelope(new Envelope());
 				aclMessage.getEnvelope().setPayloadEncoding("ISO8859_1");
-				aclMessage.setContentObject((Serializable)objeto);
+				aclMessage.setContent(objeto);
 				agent.send(aclMessage);
 			}
-		}
-		catch(IOException e)
-		{
-			//JOptionPane.showMessageDialog(null, "Agente "+getLocalName()+": "+e.getMessage(), "Error",JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
+	}
+	
+	public static void enviarMensaje(Agent agent, String tipo, Object objeto, int perfomativa)
+	{
+		DFAgentDescription[] dfd;
+		dfd=buscarAgentes(agent, tipo);
+			if(dfd!=null)
+			{
+				ACLMessage aclMessage = new ACLMessage(perfomativa);
+				for(int i=0;i<dfd.length;i++)
+					aclMessage.addReceiver(dfd[i].getName());
+				
+				aclMessage.setOntology("ontologia");
+				aclMessage.setLanguage(new SLCodec().getName());
+				aclMessage.setEnvelope(new Envelope());
+				aclMessage.getEnvelope().setPayloadEncoding("ISO8859_1");
+				try {
+					aclMessage.setContentObject((Serializable)objeto);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				agent.send(aclMessage);
+			}
 	}
 	
 	

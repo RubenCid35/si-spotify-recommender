@@ -24,13 +24,13 @@ def wait_model_loading ( connection: socket, recommender: Recommender):
 
             modelos_cargados = recommender.is_active()
             
-            if not modelos_cargados:
-                response = { 'status': 500 }
-            else: 
-                response = { 'status': 200 }
-            
-            response = json.dumps( response, indent = 2)
-            connection.send( bytes ( response , encoding = 'utf-8'))
+            # if not modelos_cargados:
+            #     response = { 'status': 500 }
+            # else: 
+            #     response = { 'status': 200 }
+            # 
+            # response = json.dumps( response )
+            # connection.send( bytes ( response , encoding = 'utf-8'))
             
         except (ConnectionResetError, ConnectionAbortedError):
             logger.warning("User Has Abandoned the Connection")    
@@ -75,7 +75,9 @@ def process_petition(connection: socket, address, recommender: Recommender):
                 # logger.info(json.dumps(petition, indent = 2))
                 
                 response = recommender.recommend(petition)
-                connection.send( bytes ( json.dumps( response, indent = 2), encoding = 'utf-8'))
+                response = json.dumps( response ) + "\n"
+                logger.info(response)
+                connection.send( bytes ( response, encoding = 'utf-8'))
 
             except json.JSONDecodeError:
                 response = { "status": 401 }
