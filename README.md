@@ -25,8 +25,7 @@ Pueden hacer click en el siguiente enlace para ver: [todo](./TODO.md)
 Nota: para parar el servidor se requiere usar el administrador de tareas.
 
 1) Descargar la información del grafo de canciones. Este grafo se puede descargar del siguiente enlace y se debe colocar en `./data`. Este es el [enlace](https://upm365-my.sharepoint.com/:u:/g/personal/ruben_cid_alumnos_upm_es/ESyOC13tmgpFuG6VwIeqriEBsiPcyI5bPeeT6Qod3dRNWw?e=xlaFId).
-2) 
-3) Descargar las librerias de python: 
+2) Descargar las librerias de python: 
 ```bash
 pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpup  
 
