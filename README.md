@@ -23,7 +23,7 @@ Pueden hacer click en el siguiente enlace para ver: [todo](./TODO.md)
 ## Uso 
 
 1) Descargar la información del grafo de canciones. Este grafo se puede descargar del siguiente enlace y se debe colocar en `./data`. Este es el [enlace](https://upm365-my.sharepoint.com/:u:/g/personal/ruben_cid_alumnos_upm_es/ESyOC13tmgpFuG6VwIeqriEBsiPcyI5bPeeT6Qod3dRNWw?e=xlaFId).
-2) Descargar las librerias del dockerfile y ejecutar el servidor con el comando:
+2) Descargar las librerias del dockerfile (pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpup,pip install --no-cache-dir dgl -f https://data.dgl.ai/wheels/repo.html,pip install --no-cache-dir dglgo -f https://data.dgl.ai/wheels-test/repo.html,pip install --no-cache-dir networkx=2.8.8) y ejecutar el servidor con el comando:
 ```python
 python ./src/python/recommend/server.py
 ```
